@@ -9,15 +9,15 @@ db = Postgres(database_source)
 
 def recreate():
     db.run("""drop table request;
-              drop table customer;
-              drop table repairment;
-              drop table workshop;
-              drop table location;
               drop table charging;
+              drop table repair;
+              drop table customer;
+              drop table workshop;
               drop table charging_station;
               drop table car;
               drop table model;
-              drop table car_provider;""")
+              drop table car_provider;
+              drop table location;""")
     db.run(open('database-schema.sql', 'r').read())
 
 
@@ -65,16 +65,16 @@ def insert_location():
     house = [randint(1, 100) for i in range(100)]
     script = """INSERT INTO location (country, city, zipcode, street, house) VALUES ('{}','{}','{}','{}','{}')"""
     for i in range(10000):
-        db.run(script.format(choice(countries), choice(cities), choice(zipcode), choice(street), choice(house)))
+        db.run(script.format(*map(choice, [countries, cities, zipcode, street, house])))
 
 
 def insert_charging_station():
     locations = db.all('SELECT location_id from location')
-    for i in range(0, 1000):
+    script = """INSERT INTO charging_station (available_sockets, maximum_sockets, location_id) 
+                VALUES ('{}','{}','{}')"""
+    for i in range(1000):
         sockets = randint(5, 10)
-        db.run(
-            'INSERT INTO charging_station (available_sockets, maximum_sockets, location_id) VALUES ({},{},{})'.format(
-                sockets, sockets, choices(locations)))
+        db.run(script.format(sockets, sockets, choice(locations)))
 
 
 if __name__ == '__main__':
@@ -84,3 +84,4 @@ if __name__ == '__main__':
     insert_cars()
     insert_location()
     insert_customers()
+    insert_charging_station()

@@ -165,7 +165,7 @@ create table repairment
 	end_date timestamp not null
 );
 
-alter table repairment owner to postgres;
+alter table repair owner to postgres;
 
 create table charging
 (
