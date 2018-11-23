@@ -7,6 +7,20 @@ from config import database_source
 db = Postgres(database_source)
 
 
+def recreate():
+    db.run("""drop table request;
+              drop table customer;
+              drop table repairment;
+              drop table workshop;
+              drop table location;
+              drop table charging;
+              drop table charging_station;
+              drop table car;
+              drop table model;
+              drop table car_provider;""")
+    db.run(open('database-schema.sql', 'r').read())
+
+
 def insert_models():
     db.run('DELETE from model')
     ids = db.all('SELECT provider_id from car_provider')
@@ -55,11 +69,12 @@ def insert_location():
     street = [''.join(choices(string.ascii_lowercase, k=15)).capitalize() for i in range(1000)]
     house = [randint(1, 100) for i in range(100)]
     script = """INSERT INTO location (country, city, zipcode, street, house) VALUES ('{}','{}','{}','{}','{}')"""
-    for i in range(1000):
+    for i in range(10000):
         db.run(script.format(choice(countries), choice(cities), choice(zipcode), choice(street), choice(house)))
 
 
 if __name__ == '__main__':
+    recreate()
     insert_car_providers()
     insert_models()
     insert_cars()
