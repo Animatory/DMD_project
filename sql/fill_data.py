@@ -12,10 +12,10 @@ def insert_models():
     ids = db.all('SELECT provider_id from car_provider')
     script = """INSERT INTO model (class, max_charge, capacity, provider_id, price) VALUES ('{}','{}','{}','{}','{}')"""
     for i in range(10):
-        db.run(script.format(rand_item(model_classes),
+        db.run(script.format(choice(model_classes),
                              randint(8, 14) * 1000,
                              randint(2, 6),
-                             rand_item(ids),
+                             choice(ids),
                              choice(range(10, 1000))))
 
 
@@ -31,28 +31,22 @@ def insert_cars():
     script = """INSERT INTO car (model_id, vin, available, color, number) VALUES ('{}','{}','{}','{}','{}')"""
     for i in range(100):
         rand_number = ''.join(choices(string.ascii_uppercase + string.digits, k=5))
-        db.run(script.format(rand_item(models), randint(1e8, 1e9-1), True, rand_item(colors), rand_number))
+        db.run(script.format(choice(models), randint(1e8, 1e9 - 1), True, choice(colors), rand_number))
 
 
 def insert_customers():
     db.run('DELETE from customer')
+    script = """INSERT INTO customer (username, email, name, surname, phone, location_id) VALUES 
+                ('{}','{}','{}','{}','{}','{}')"""
     for i in range(1000):
-        name = rand_item(names)
+        name = choice(names)
         username = str(randint(0, 100)) + name + ''.join(choices(string.ascii_uppercase, k=4))
         email = str(randint(0, 1000)) + name + str(randint(0, 1000)) + '@gmail.com'
-        db.run('''INSERT INTO customer (username, email, name, surname, phone, location_id) VALUES 
-        ('{}','{}','{}','{}','{}',{})'''.format(username,
-                                                email,
-                                                name,
-                                                ''.join(choices(string.ascii_uppercase, k=3)),
-                                                '+' + str(randint(1e7, 1e8 - 1)), 1))
+        db.run(script.format(username, email, name,
+                             ''.join(choices(string.ascii_uppercase, k=3)),
+                             '+' + str(randint(1e7, 1e8 - 1)), 1))
 
 
-#
-# def insert_charging_station():
-#     db.run('DELETE from charging_station')
-#     for i in range(100):
-#         db.run("INSERT INTO charging_station (latitude, longitude, available_sockets, maximum_sockets) values ({},{},{},{})".format(ra)
 def insert_location():
     db.run('DELETE from location')
     countries = [''.join(choices(string.ascii_lowercase, k=10)).capitalize() for i in range(10)]
