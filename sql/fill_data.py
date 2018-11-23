@@ -22,7 +22,6 @@ def recreate():
 
 
 def insert_models():
-    db.run('DELETE from model')
     ids = db.all('SELECT provider_id from car_provider')
     script = """INSERT INTO model (class, max_charge, capacity, provider_id, price) VALUES ('{}','{}','{}','{}','{}')"""
     for i in range(10):
@@ -34,13 +33,11 @@ def insert_models():
 
 
 def insert_car_providers():
-    db.run('DELETE from car_provider')
     for name in names:
         db.run("""INSERT INTO car_provider (company_name) VALUES ('{}')""".format(name))
 
 
 def insert_cars():
-    db.run('DELETE from car')
     models = db.all('SELECT model_id from model')
     script = """INSERT INTO car (model_id, vin, available, color, number) VALUES ('{}','{}','{}','{}','{}')"""
     for i in range(100):
@@ -49,7 +46,6 @@ def insert_cars():
 
 
 def insert_customers():
-    db.run('DELETE from customer')
     script = """INSERT INTO customer (username, email, name, surname, phone, location_id) VALUES 
                 ('{}','{}','{}','{}','{}','{}')"""
     for i in range(1000):
@@ -62,7 +58,6 @@ def insert_customers():
 
 
 def insert_location():
-    db.run('DELETE from location')
     countries = [''.join(choices(string.ascii_lowercase, k=10)).capitalize() for i in range(10)]
     cities = [''.join(choices(string.ascii_lowercase, k=5)).capitalize() for i in range(100)]
     zipcode = [randint(1e6, 1e7 - 1) for i in range(100)]
