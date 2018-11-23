@@ -4,7 +4,6 @@ from sql.data import *
 import string
 from config import database_source
 
-
 db = Postgres(database_source)
 
 
@@ -35,7 +34,6 @@ def insert_cars():
         db.run(script.format(choice(models), randint(1e8, 1e9 - 1), True, choice(colors), rand_number))
 
 
-
 def insert_customers():
     db.run('DELETE from customer')
     locations = db.all('SELECT location_id from location')
@@ -58,11 +56,17 @@ def insert_customers():
 def insert_charging_station():
     db.run('DELETE from charging_station')
     locations = db.all('SELECT location_id from location')
+    script = """INSERT INTO customer (username, email, name, surname, phone, location_id) VALUES 
+                   ('{}','{}','{}','{}','{}','{}')"""
     for i in range(100):
         sockets = randint(5, 10)
-    db.run(script.format(username, email, name,
+        name = choice(names)
+        username = str(randint(0, 100)) + name + ''.join(choices(string.ascii_uppercase, k=4))
+        email = str(randint(0, 1000)) + name + str(randint(0, 1000)) + '@gmail.com'
+        db.run(script.format(username, email, name,
                              ''.join(choices(string.ascii_uppercase, k=3)),
                              '+' + str(randint(1e7, 1e8 - 1)), 1))
+
 
 def insert_location():
     db.run('DELETE from location')
