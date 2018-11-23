@@ -2,7 +2,7 @@ from postgres import Postgres
 from random import randint, choices, choice
 from sql.data import *
 import string
-from sql.config import database_source
+from config import database_source
 
 db = Postgres(database_source)
 
