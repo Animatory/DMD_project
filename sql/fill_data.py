@@ -27,11 +27,11 @@ def insert_car_providers():
 
 def insert_cars():
     db.run('DELETE from car')
-    models = db.run('SELECT model_id from model')
+    models = db.all('SELECT model_id from model')
     for i in range(100):
         rand_number = ''.join(choices(string.ascii_uppercase + string.digits, k=5))
         db.run('''INSERT INTO car (model_id, vin, available, color, number) 
-        VALUES ({},{},{},'{}','{}')'''.format(rand_item(models), randint(10000, 99999), 1, rand_item(colors),
+        VALUES ({},{},{},'{}','{}')'''.format(rand_item(models), randint(10000, 99999), True, rand_item(colors),
                                               rand_number))
 
 
