@@ -3,10 +3,7 @@ from random import randint, choices
 from sql.data import *
 import string
 
-db = Postgres('postgres://inno_points:inno_points@localhost:5432/inno_points')
-
-
-# print(random(0,3))
+db = Postgres('postgres://postgres:123456789@localhost:5432/postgres')
 
 
 def insert_models():
