@@ -6,11 +6,8 @@ import string
 db = Postgres('postgres://inno_points:inno_points@localhost:5432/inno_points')
 
 
-# print(random(0,3))
-
-
 def insert_models():
-    db.run('DELETE  from model')
+    db.run('DELETE from model')
     ids = db.all('SELECT provider_id from car_provider')
     for i in range(10):
         db.run(
@@ -35,7 +32,29 @@ def insert_cars():
                                               rand_number))
 
 
+def insert_customers():
+    db.run('DELETE from customer')
+    for i in range(1000):
+        name = rand_item(names)
+        username = str(randint(0, 100)) + name + ''.join(choices(string.ascii_uppercase, k=4))
+        email = str(randint(0, 1000)) + name + str(randint(0, 1000)) + '@gmail.com'
+        db.run('''INSERT INTO customer (username, email, name, surname, phone, location_id) VALUES 
+        ('{}','{}','{}','{}','{}',{})'''.format(username,
+                                                email,
+                                                name,
+                                                ''.join(choices(string.ascii_uppercase, k=3)),
+                                                '+' + str(randint(1e7, 1e8 - 1)), 1))
+
+
+#
+# def insert_charging_station():
+#     db.run('DELETE from charging_station')
+#     for i in range(100):
+#         db.run("INSERT INTO charging_station (latitude, longitude, available_sockets, maximum_sockets) values ({},{},{},{})".format(ra)
+
+
 if __name__ == '__main__':
     insert_car_providers()
     insert_models()
     insert_cars()
+    insert_customers()
