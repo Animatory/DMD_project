@@ -3,7 +3,7 @@ from random import randint, choices, choice
 from sql.data import *
 import string
 from config import database_source
-from datetime import datetime, time, timedelta as td
+from datetime import datetime, time
 
 db = Postgres(database_source)
 
@@ -82,11 +82,10 @@ def insert_workshop():
     locations = db.all('SELECT location_id from location')
     script = """INSERT INTO workshop (open_time, close_time, location_id) 
                 VALUES ('{}','{}','{}')"""
-    start = datetime(2015, 1, 1, 0, 0, 0)
     for i in range(11):
-        start_time = start + td(hours=randint(5, 10))
-        end_time = start_time + td(hours=randint(5, 10))
-        db.run(script.format(start_time.strftime('%H:%M:%S'), end_time.strftime('%H:%M:%S'), choice(locations)))
+        start_time = time.isoformat(time(hour=randint(5, 10)))
+        end_time = time.isoformat(time(hour=randint(20, 23)))
+        db.run(script.format(start_time, end_time, choice(locations)))
 
 
 def insert_repair():
@@ -144,8 +143,6 @@ def insert_request():
         db.run(script.format(customer, car_id, payment, start_time, end_time,
                              start_locations, end_locations, waiting_time, length))
 
-
-
 def fill_data():
     recreate()
     insert_location()
@@ -153,11 +150,11 @@ def fill_data():
     insert_car_providers()
     insert_models()
     insert_cars()
+    insert_workshop()
     insert_charging_station()
     insert_charging()
     insert_repair()
     insert_request()
-    insert_workshop()
 
 
 if __name__ == '__main__':
