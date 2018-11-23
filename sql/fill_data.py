@@ -68,14 +68,6 @@ def insert_location():
         db.run(script.format(choice(countries), choice(cities), choice(zipcode), choice(street), choice(house)))
 
 
-# def insert_charging():
-#     cars = db.all('SELECT car_id from car')
-#     stations = db.all('SELECT station_id from charging_station')
-#     for i in range(10000):
-#         db.run(
-#             'INSERT INTO charging (car_id, station_id, start_date, end_date) VALUES ({},{},{},{})'.format(choice(cars),
-#                                                                                                           choice(
-#                                                                                                               stations),))
 def insert_charging_station():
     locations = db.all('SELECT location_id from location')
     for i in range(0, 1000):
