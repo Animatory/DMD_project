@@ -3,6 +3,7 @@ from random import randint, choices, choice
 from sql.data import *
 import string
 from config import database_source
+from datetime import datetime
 
 db = Postgres(database_source)
 
@@ -93,11 +94,39 @@ def insert_workshop():
 
 
 
+def insert_repair():
+    cars = db.all('SELECT car_id from car')
+    workshops = db.all('SELECT workshop_id from workshop')
+    script = """INSERT INTO charging (car_id, station_id, start_date, end_date) 
+                VALUES ('{}','{}','{}','{}')"""
+    for i in range(11):
+        timestamp = randint(1e9, 2e9)
+        timedelta = randint(1e5, 1e6)
+        start_time = datetime.isoformat(datetime.fromtimestamp(timestamp), sep=' ')
+        end_time = datetime.isoformat(datetime.fromtimestamp(timestamp+timedelta), sep=' ')
+        db.run(script.format(choice(cars), choice(workshops), start_time, end_time))
+
+
+def insert_charging():
+    cars = db.all('SELECT car_id from car')
+    stations = db.all('SELECT station_id from charging_station')
+    script = """INSERT INTO charging (car_id, station_id, start_date, end_date) 
+                VALUES ('{}','{}','{}','{}')"""
+    for i in range(11):
+        timestamp = randint(1e9, 2e9)
+        timedelta = randint(1e5, 1e6)
+        start_time = datetime.isoformat(datetime.fromtimestamp(timestamp), sep=' ')
+        end_time = datetime.isoformat(datetime.fromtimestamp(timestamp+timedelta), sep=' ')
+        db.run(script.format(choice(cars), choice(stations), start_time, end_time))
+
+
 if __name__ == '__main__':
     recreate()
+    insert_location()
+    insert_customers()
     insert_car_providers()
     insert_models()
     insert_cars()
-    insert_location()
-    insert_customers()
     insert_charging_station()
+    insert_charging()
+    insert_repair()
