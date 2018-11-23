@@ -41,7 +41,7 @@ def insert_car_providers():
 def insert_cars():
     models = db.all('SELECT model_id from model')
     script = """INSERT INTO car (model_id, vin, available, color, number) VALUES ('{}','{}','{}','{}','{}')"""
-    for i in range(100):
+    for i in range(1000):
         rand_number = ''.join(choices(string.ascii_uppercase + string.digits, k=5))
         db.run(script.format(choice(models), randint(1e8, 1e9 - 1), True, choice(colors), rand_number))
 
@@ -75,14 +75,14 @@ def insert_charging_station():
         sockets = randint(5, 10)
         db.run(
             'INSERT INTO charging_station (available_sockets, maximum_sockets, location_id) VALUES ({},{},{})'.format(
-                sockets, sockets, choices(locations)))
+                sockets, sockets, choice(locations)))
 
 
 def insert_request():
     username = db.all('SELECT username from customer')
     cars = db.all('SELECT car_id from car')
     locations = db.all('SELECT location_id from location')
-    for i in range(100000):
+    for i in range(1000):
         db.run(
             'INSERT INTO request (username, car_id, payment, start_time, end_time, start_location_id, end_location_id, time_for_car_arrival, trip_duration) VALUES ({},{},{},{},{},{},{},{},{})'.format(
                 choice(username), choice(cars), randint(100, 3000), '2018:01:01 12:00:00', '2018:01:01 12:00:00',
@@ -139,7 +139,7 @@ def insert_request():
         start_locations = choice(locations)
         end_locations = choice(locations)
         timestamp = randint(1e9, 2e9)
-        waiting_time = timedelta(seconds=randint(300, 3000))
+        waiting_time = td(seconds=randint(300, 3000))
         length = randint(1, 30)
         timedelta = length / randint(40, 120) * 3600
         payment = timedelta / 3600 * randint(100, 2000)
@@ -158,9 +158,10 @@ def fill_data():
     insert_cars()
     insert_charging_station()
     insert_charging()
+    insert_workshop()
     insert_repair()
     insert_request()
-    insert_workshop()
+
 
 
 if __name__ == '__main__':
