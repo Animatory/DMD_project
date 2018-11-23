@@ -68,18 +68,6 @@ def insert_location():
         db.run(script.format(choice(countries), choice(cities), choice(zipcode), choice(street), choice(house)))
 
 
-def insert_charging_station():
-    db.run('DELETE from charging_station')
-    locations = db.all('SELECT location_id from location')
-    script = """INSERT INTO customer (username, email, name, surname, phone, location_id) VALUES 
-                   ('{}','{}','{}','{}','{}','{}')"""
-    for i in range(100):
-        sockets = randint(5, 10)
-        name = choice(names)
-        username = str(randint(0, 100)) + name + ''.join(choices(string.ascii_uppercase, k=4))
-        email = str(randint(0, 1000)) + name + str(randint(0, 1000)) + '@gmail.com'
-
-
 # def insert_charging():
 #     cars = db.all('SELECT car_id from car')
 #     stations = db.all('SELECT station_id from charging_station')
@@ -88,6 +76,13 @@ def insert_charging_station():
 #             'INSERT INTO charging (car_id, station_id, start_date, end_date) VALUES ({},{},{},{})'.format(choice(cars),
 #                                                                                                           choice(
 #                                                                                                               stations),))
+def insert_charging_station():
+    locations = db.all('SELECT location_id from location')
+    for i in range(0, 1000):
+        sockets = randint(5, 10)
+        db.run(
+            'INSERT INTO charging_station (available_sockets, maximum_sockets, location_id) VALUES ({},{},{})'.format(
+                sockets, sockets, choices(locations)))
 
 
 if __name__ == '__main__':
