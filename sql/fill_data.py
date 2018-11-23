@@ -60,7 +60,6 @@ def insert_customers():
                              ''.join(choices(string.ascii_uppercase, k=3)),
                              '+' + str(randint(1e7, 1e8 - 1)), 1))
 
-
 def insert_location():
     db.run('DELETE from location')
     countries = [''.join(choices(string.ascii_lowercase, k=10)).capitalize() for i in range(10)]
