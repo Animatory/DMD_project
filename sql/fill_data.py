@@ -1,8 +1,10 @@
 from postgres import Postgres
-from random import randint, choices
+from random import randint, choices, uniform
 from sql.data import *
 import string
-from configs import db
+from configs import database_source
+
+db = Postgres(database_source)
 
 
 def insert_models():
@@ -44,12 +46,18 @@ def insert_customers():
                                                 ''.join(choices(string.ascii_uppercase, k=3)),
                                                 '+' + str(randint(1e7, 1e8 - 1)), 1))
 
+    #
 
-#
-# def insert_charging_station():
-#     db.run('DELETE from charging_station')
-#     for i in range(100):
-#         db.run("INSERT INTO charging_station (latitude, longitude, available_sockets, maximum_sockets) values ({},{},{},{})".format(ra)
+
+def insert_charging_station():
+    db.run('DELETE from charging_station')
+    for i in range(100):
+        sockets = randint(5, 10)
+        db.run(
+            "INSERT INTO charging_station (available_sockets, maximum_sockets,location_id) values ({},{},{})".format(
+                sockets, sockets, 1))
+
+
 def insert_location():
     db.run('DELETE from location')
     countries = [''.join(choices(string.ascii_lowercase, k=10)).capitalize() for i in range(10)]
@@ -64,7 +72,8 @@ def insert_location():
 
 
 if __name__ == '__main__':
-    insert_car_providers()
-    insert_models()
-    insert_cars()
-    insert_customers()
+    # insert_car_providers()
+    # insert_models()
+    # insert_cars()
+    # insert_customers()
+    insert_charging_station()
