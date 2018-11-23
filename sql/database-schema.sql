@@ -115,8 +115,7 @@ create table car
 			primary key,
 	model_id integer
 		constraint model_fk
-			references model
-				on delete set null,
+			references model,
 	vin integer not null,
 	available boolean default false,
 	color text,
