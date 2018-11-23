@@ -41,7 +41,7 @@ def insert_car_providers():
 def insert_cars():
     models = db.all('SELECT model_id from model')
     script = """INSERT INTO car (model_id, vin, available, color, number) VALUES ('{}','{}','{}','{}','{}')"""
-    for i in range(100):
+    for i in range(1000):
         rand_number = ''.join(choices(string.ascii_uppercase + string.digits, k=5))
         db.run(script.format(choice(models), randint(1e8, 1e9 - 1), True, choice(colors), rand_number))
 
@@ -142,6 +142,7 @@ def insert_request():
 
         db.run(script.format(customer, car_id, payment, start_time, end_time,
                              start_locations, end_locations, waiting_time, length))
+
 
 def fill_data():
     recreate()
