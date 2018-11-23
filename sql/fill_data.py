@@ -3,17 +3,17 @@ from random import randint, choices, choice
 from sql.data import *
 import string
 from config import database_source
-from datetime import datetime, timedelta as td
+from datetime import datetime, time, timedelta as td
 
 db = Postgres(database_source)
 
 
 def recreate():
     db.run("""drop table request;
-              drop table customer;
-              drop table repair;
-              drop table workshop;
               drop table charging;
+              drop table repair;
+              drop table customer;
+              drop table workshop;
               drop table charging_station;
               drop table car;
               drop table model;
@@ -68,31 +68,20 @@ def insert_location():
     for i in range(1000):
         db.run(script.format(choice(countries), choice(cities), choice(zipcode), choice(street), choice(house)))
 
-
 def insert_charging_station():
     locations = db.all('SELECT location_id from location')
-    for i in range(0, 100):
+    script = """INSERT INTO charging_station (available_sockets, maximum_sockets, location_id) 
+                VALUES ('{}','{}','{}')"""
+    for i in range(100):
         sockets = randint(5, 10)
-        db.run(
-            'INSERT INTO charging_station (available_sockets, maximum_sockets, location_id) VALUES ({},{},{})'.format(
-                sockets, sockets, choice(locations)))
+        db.run(script.format(sockets, sockets, choice(locations)))
 
-
-def insert_request():
-    username = db.all('SELECT username from customer')
-    cars = db.all('SELECT car_id from car')
-    locations = db.all('SELECT location_id from location')
-    for i in range(1000):
-        db.run(
-            'INSERT INTO request (username, car_id, payment, start_time, end_time, start_location_id, end_location_id, time_for_car_arrival, trip_duration) VALUES ({},{},{},{},{},{},{},{},{})'.format(
-                choice(username), choice(cars), randint(100, 3000), '2018:01:01 12:00:00', '2018:01:01 12:00:00',
-                choice(locations), choice(locations)))
 
 
 def insert_workshop():
     locations = db.all('SELECT location_id from location')
     script = """INSERT INTO workshop (open_time, close_time, location_id) 
-                VALUES ('{}','{}', {})"""
+                VALUES ('{}','{}','{}')"""
     start = datetime(2015, 1, 1, 0, 0, 0)
     for i in range(11):
         start_time = start + td(hours=randint(5, 10))
@@ -138,15 +127,24 @@ def insert_request():
         customer = choice(customers)
         start_locations = choice(locations)
         end_locations = choice(locations)
+        length = randint(3, 50)
+
+        waiting_time = randint(300, 3000)
         timestamp = randint(1e9, 2e9)
-        waiting_time = td(seconds=randint(300, 3000))
-        length = randint(1, 30)
-        timedelta = length / randint(40, 120) * 3600
-        payment = timedelta / 3600 * randint(100, 2000)
+        duration = round(length/randint(40, 120)*3600)
+        payment = round(duration/3600*randint(100, 2000)+waiting_time/60*10)
+
+        waiting_time = list(divmod(waiting_time, 60))
+        waiting_time[:1] = divmod(waiting_time[0], 60)
+        waiting_time = time.isoformat(time(*waiting_time))
+
         start_time = datetime.isoformat(datetime.fromtimestamp(timestamp), sep=' ')
-        end_time = datetime.isoformat(datetime.fromtimestamp(timestamp + timedelta), sep=' ')
-        db.run(script.format(customer, car_id, payment, start_time, end_time, start_locations, end_locations,
-                             waiting_time, length))
+        end_time = datetime.isoformat(datetime.fromtimestamp(timestamp+duration), sep=' ')
+
+        db.run(script.format(customer, car_id, payment, start_time, end_time,
+                             start_locations, end_locations, waiting_time, length))
+
+
 
 
 def fill_data():
