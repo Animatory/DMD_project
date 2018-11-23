@@ -63,10 +63,11 @@ create table charging_station
 	station_id serial not null
 		constraint charging_station_pkey
 			primary key,
-	latitude double precision not null,
-	longitude double precision not null,
 	available_sockets integer not null,
-	maximum_sockets integer not null
+	maximum_sockets integer not null,
+	location_id integer
+		constraint charging_station_location_location_id_fk
+			references location
 );
 
 alter table charging_station owner to postgres;
@@ -112,9 +113,10 @@ create table car
 	car_id serial not null
 		constraint car_pk
 			primary key,
-	model_id integer not null
+	model_id integer
 		constraint model_fk
-			references model,
+			references model
+				on delete set null,
 	vin integer not null,
 	available boolean default false,
 	color text,
