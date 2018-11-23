@@ -126,14 +126,37 @@ def insert_charging():
         db.run(script.format(choice(cars), choice(stations), start_time, end_time))
 
 
+def insert_request():
+    customers = db.all('SELECT username from customer')
+    cars = db.all('SELECT car_id from car')
+    locations = db.all('SELECT location_id from location')
+    script = """INSERT INTO request (username, car_id, payment, start_time, end_time, start_location_id,
+                                     end_location_id, waiting_time, route_length) 
+                VALUES ('{}','{}','{}','{}','{}','{}','{}','{}','{}')"""
+    for i in range(11):
+        car_id = choice(cars)
+        customer = choice(customers)
+        start_locations = choice(locations)
+        end_locations = choice(locations)
+        timestamp = randint(1e9, 2e9)
+        waiting_time = timedelta(seconds=randint(300, 3000))
+        length = randint(1, 30)
+        timedelta = length/randint(40, 120)*3600
+        payment = timedelta/3600*randint(100, 2000)
+        start_time = datetime.isoformat(datetime.fromtimestamp(timestamp), sep=' ')
+        end_time = datetime.isoformat(datetime.fromtimestamp(timestamp+timedelta), sep=' ')
+        db.run(script.format(customer, car_id, payment, start_time, end_time, start_locations, end_locations,
+                             waiting_time, length))
+
 if __name__ == '__main__':
     recreate()
     insert_location()
-    # insert_customers()
-    # insert_car_providers()
-    # insert_models()
-    # insert_cars()
-    # insert_charging_station()
-    # insert_charging()
-    # insert_repair()
+    insert_customers()
+    insert_car_providers()
+    insert_models()
+    insert_cars()
+    insert_charging_station()
+    insert_charging()
+    insert_repair()
+    insert_request()
     insert_workshop()
