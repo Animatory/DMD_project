@@ -3,7 +3,7 @@ from random import randint, choices, choice
 from sql.data import *
 import string
 from config import database_source
-from datetime import datetime, timedelta
+from datetime import datetime, time, timedelta
 
 db = Postgres(database_source)
 
@@ -116,15 +116,23 @@ def insert_request():
         customer = choice(customers)
         start_locations = choice(locations)
         end_locations = choice(locations)
+        length = randint(3, 50)
+
+        waiting_time = randint(300, 3000)
         timestamp = randint(1e9, 2e9)
-        waiting_time = timedelta(seconds=randint(300, 3000))
-        length = randint(1, 30)
-        timedelta = length/randint(40, 120)*3600
-        payment = timedelta/3600*randint(100, 2000)
+        duration = round(length/randint(40, 120)*3600)
+        payment = round(duration/3600*randint(100, 2000)+waiting_time/60*10)
+
+        waiting_time = list(divmod(waiting_time, 60))
+        waiting_time[:1] = divmod(waiting_time[0], 60)
+        waiting_time = time.isoformat(time(*waiting_time))
+
         start_time = datetime.isoformat(datetime.fromtimestamp(timestamp), sep=' ')
-        end_time = datetime.isoformat(datetime.fromtimestamp(timestamp+timedelta), sep=' ')
-        db.run(script.format(customer, car_id, payment, start_time, end_time, start_locations, end_locations,
-                             waiting_time, length))
+        end_time = datetime.isoformat(datetime.fromtimestamp(timestamp+duration), sep=' ')
+
+        db.run(script.format(customer, car_id, payment, start_time, end_time,
+                             start_locations, end_locations, waiting_time, length))
+
 
 if __name__ == '__main__':
     recreate()
@@ -135,5 +143,5 @@ if __name__ == '__main__':
     insert_cars()
     insert_charging_station()
     insert_charging()
-    insert_repair()
+    # insert_repair()
     insert_request()
