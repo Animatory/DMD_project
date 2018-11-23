@@ -153,7 +153,7 @@ create table request
 
 alter table request owner to postgres;
 
-create table repairment
+create table repair
 (
 	car_id integer not null
 		constraint car_fk

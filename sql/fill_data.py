@@ -9,10 +9,10 @@ db = Postgres(database_source)
 
 def recreate():
     db.run("""drop table request;
-              drop table charging;
-              drop table repair;
               drop table customer;
+              drop table repair;
               drop table workshop;
+              drop table charging;
               drop table charging_station;
               drop table car;
               drop table model;
@@ -64,17 +64,33 @@ def insert_location():
     street = [''.join(choices(string.ascii_lowercase, k=15)).capitalize() for i in range(1000)]
     house = [randint(1, 100) for i in range(100)]
     script = """INSERT INTO location (country, city, zipcode, street, house) VALUES ('{}','{}','{}','{}','{}')"""
-    for i in range(10000):
-        db.run(script.format(*map(choice, [countries, cities, zipcode, street, house])))
+    for i in range(1000):
+        db.run(script.format(choice(countries), choice(cities), choice(zipcode), choice(street), choice(house)))
 
 
 def insert_charging_station():
     locations = db.all('SELECT location_id from location')
-    script = """INSERT INTO charging_station (available_sockets, maximum_sockets, location_id) 
-                VALUES ('{}','{}','{}')"""
-    for i in range(1000):
+    for i in range(0, 100):
         sockets = randint(5, 10)
-        db.run(script.format(sockets, sockets, choice(locations)))
+        db.run(
+            'INSERT INTO charging_station (available_sockets, maximum_sockets, location_id) VALUES ({},{},{})'.format(
+                sockets, sockets, choices(locations)))
+
+
+def insert_request():
+    username = db.all('SELECT username from customer')
+    cars = db.all('SELECT car_id from car')
+    locations = db.all('SELECT location_id from location')
+    for i in range(100000):
+        db.run(
+            'INSERT INTO request (username, car_id, payment, start_time, end_time, start_location_id, end_location_id, time_for_car_arrival, trip_duration) VALUES ({},{},{},{},{},{},{},{},{})'.format(
+                choice(username), choice(cars), randint(100, 3000), '2018:01:01 12:00:00', '2018:01:01 12:00:00',
+                choice(locations), choice(locations)))
+
+
+def insert_workshop():
+    for i in range(30):
+
 
 
 if __name__ == '__main__':
