@@ -95,8 +95,8 @@ def insert_workshop():
                 VALUES ('{}','{}', {})"""
     start = datetime(2015, 1, 1, 0, 0, 0)
     for i in range(11):
-        start_time =start + td(hours=randint(5, 10))
-        end_time =  start_time + td(hours=randint(5, 10))
+        start_time = start + td(hours=randint(5, 10))
+        end_time = start_time + td(hours=randint(5, 10))
         db.run(script.format(start_time.strftime('%H:%M:%S'), end_time.strftime('%H:%M:%S'), choice(locations)))
 
 
@@ -141,14 +141,15 @@ def insert_request():
         timestamp = randint(1e9, 2e9)
         waiting_time = timedelta(seconds=randint(300, 3000))
         length = randint(1, 30)
-        timedelta = length/randint(40, 120)*3600
-        payment = timedelta/3600*randint(100, 2000)
+        timedelta = length / randint(40, 120) * 3600
+        payment = timedelta / 3600 * randint(100, 2000)
         start_time = datetime.isoformat(datetime.fromtimestamp(timestamp), sep=' ')
-        end_time = datetime.isoformat(datetime.fromtimestamp(timestamp+timedelta), sep=' ')
+        end_time = datetime.isoformat(datetime.fromtimestamp(timestamp + timedelta), sep=' ')
         db.run(script.format(customer, car_id, payment, start_time, end_time, start_locations, end_locations,
                              waiting_time, length))
 
-if __name__ == '__main__':
+
+def fill_data():
     recreate()
     insert_location()
     insert_customers()
@@ -160,3 +161,7 @@ if __name__ == '__main__':
     insert_repair()
     insert_request()
     insert_workshop()
+
+
+if __name__ == '__main__':
+    fill_data()
