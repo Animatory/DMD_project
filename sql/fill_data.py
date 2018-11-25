@@ -78,6 +78,7 @@ def insert_charging_station():
         db.run(script.format(sockets, sockets, choice(locations)))
 
 
+
 def insert_workshop():
     locations = db.all('SELECT location_id from location')
     script = """INSERT INTO workshop (open_time, close_time, location_id) 
@@ -106,7 +107,7 @@ def insert_charging():
     stations = db.all('SELECT station_id from charging_station')
     script = """INSERT INTO charging (car_id, station_id, start_date, end_date) 
                     VALUES ('{}','{}','{}','{}')"""
-    for i in range(11):
+    for i in range(1100):
         timestamp = randint(1e9, 2e9)
         timedelta = randint(1e5, 1e6)
         start_time = datetime.isoformat(datetime.fromtimestamp(timestamp), sep=' ')
@@ -121,7 +122,7 @@ def insert_request():
     script = """INSERT INTO request (username, car_id, payment, start_time, end_time, start_location_id,
                                      end_location_id, waiting_time, route_length) 
                 VALUES ('{}','{}','{}','{}','{}','{}','{}','{}','{}')"""
-    for i in range(11):
+    for i in range(1000):
         car_id = choice(cars)
         customer = choice(customers)
         start_locations = choice(locations)
@@ -130,15 +131,15 @@ def insert_request():
 
         waiting_time = randint(300, 3000)
         timestamp = randint(1e9, 2e9)
-        duration = round(length/randint(40, 120)*3600)
-        payment = round(duration/3600*randint(100, 2000)+waiting_time/60*10)
+        duration = round(length / randint(40, 120) * 3600)
+        payment = round(duration / 3600 * randint(100, 2000) + waiting_time / 60 * 10)
 
         waiting_time = list(divmod(waiting_time, 60))
         waiting_time[:1] = divmod(waiting_time[0], 60)
         waiting_time = time.isoformat(time(*waiting_time))
 
         start_time = datetime.isoformat(datetime.fromtimestamp(timestamp), sep=' ')
-        end_time = datetime.isoformat(datetime.fromtimestamp(timestamp+duration), sep=' ')
+        end_time = datetime.isoformat(datetime.fromtimestamp(timestamp + duration), sep=' ')
 
         db.run(script.format(customer, car_id, payment, start_time, end_time,
                              start_locations, end_locations, waiting_time, length))
