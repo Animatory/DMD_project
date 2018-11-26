@@ -2,7 +2,7 @@ from postgres import Postgres
 from random import randint, choices, choice
 from sql.data import *
 import string
-from config import database_source
+from config import database_source, start_stamp, end_stamp
 from datetime import datetime, time, timedelta as td
 
 db = Postgres(database_source)
@@ -49,7 +49,7 @@ def insert_cars():
 def insert_customers():
     script = """INSERT INTO customer (username, email, name, surname, phone, location_id) VALUES 
                 ('{}','{}','{}','{}','{}','{}')"""
-    for i in range(100):
+    for i in range(50):
         name = choice(names)
         username = str(randint(0, 100)) + name + ''.join(choices(string.ascii_uppercase, k=4))
         email = str(randint(0, 1000)) + name + str(randint(0, 1000)) + '@gmail.com'
@@ -94,8 +94,8 @@ def insert_repair():
     workshops = db.all('SELECT workshop_id from workshop')
     script = """INSERT INTO charging (car_id, station_id, start_date, end_date) 
                 VALUES ('{}','{}','{}','{}')"""
-    for i in range(11):
-        timestamp = randint(1e9, 2e9)
+    for i in range(110):
+        timestamp = randint(start_stamp, end_stamp)
         timedelta = randint(1e5, 1e6)
         start_time = datetime.isoformat(datetime.fromtimestamp(timestamp), sep=' ')
         end_time = datetime.isoformat(datetime.fromtimestamp(timestamp + timedelta), sep=' ')
@@ -107,8 +107,8 @@ def insert_charging():
     stations = db.all('SELECT station_id from charging_station')
     script = """INSERT INTO charging (car_id, station_id, start_date, end_date) 
                     VALUES ('{}','{}','{}','{}')"""
-    for i in range(1100):
-        timestamp = randint(2e1, 2e6)
+    for i in range(2000):
+        timestamp = randint(start_stamp, end_stamp)
         timedelta = randint(1e2, 1e3)
         start_time = datetime.isoformat(datetime.fromtimestamp(timestamp), sep=' ')
         end_time = datetime.isoformat(datetime.fromtimestamp(timestamp + timedelta), sep=' ')
@@ -130,7 +130,7 @@ def insert_request():
         length = randint(3, 50)
 
         waiting_time = randint(300, 3000)
-        timestamp = randint(1e9, 2e9)
+        timestamp = randint(start_stamp, end_stamp)
         duration = round(length / randint(40, 120) * 3600)
         payment = round(duration / 3600 * randint(100, 2000) + waiting_time / 60 * 10)
 
@@ -146,21 +146,18 @@ def insert_request():
 
 
 def fill_data():
-    pass
-    # recreate()
-    # insert_location()
-    # insert_customers()
-    # insert_car_providers()
-    # insert_models()
-    # insert_cars()
-    # insert_charging_station()
-    # insert_charging()
-    # insert_workshop()
-    # insert_repair()
-    # insert_request()
+    recreate()
+    insert_location()
+    insert_customers()
+    insert_car_providers()
+    insert_models()
+    insert_cars()
+    insert_charging_station()
+    insert_charging()
+    insert_workshop()
+    insert_repair()
+    insert_request()
 
-
-# insert_charging()
 
 if __name__ == '__main__':
-    fill_data()
+     fill_data()
