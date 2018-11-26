@@ -78,7 +78,6 @@ def insert_charging_station():
         db.run(script.format(sockets, sockets, choice(locations)))
 
 
-
 def insert_workshop():
     locations = db.all('SELECT location_id from location')
     script = """INSERT INTO workshop (open_time, close_time, location_id) 
@@ -109,7 +108,7 @@ def insert_charging():
                     VALUES ('{}','{}','{}','{}')"""
     for i in range(1100):
         timestamp = randint(1e9, 2e9)
-        timedelta = randint(1e5, 1e6)
+        timedelta = randint(1e3, 2e4)
         start_time = datetime.isoformat(datetime.fromtimestamp(timestamp), sep=' ')
         end_time = datetime.isoformat(datetime.fromtimestamp(timestamp + timedelta), sep=' ')
         db.run(script.format(choice(cars), choice(stations), start_time, end_time))
