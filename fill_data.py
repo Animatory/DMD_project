@@ -115,27 +115,27 @@ def insert_workshop():
 def insert_repair():
     cars = db.all('SELECT car_id FROM car')
     workshops = db.all('SELECT workshop_id FROM workshop')
-    query = """INSERT INTO repair (car_id, workshop_id, start_date, end_date) 
-                VALUES ('{}','{}','{}','{}')"""
+    query = """INSERT INTO repair (car_id, workshop_id, start_date, end_date,price) 
+                VALUES ('{}','{}','{}','{}',{})"""
     for i in range(11):
         timestamp = randint(start_stamp, end_stamp)
         timedelta = randint(1e5, 1e6)
         start_time = datetime.isoformat(datetime.fromtimestamp(timestamp), sep=' ')
         end_time = datetime.isoformat(datetime.fromtimestamp(timestamp + timedelta), sep=' ')
-        db.run(query.format(choice(cars), choice(workshops), start_time, end_time))
+        db.run(query.format(choice(cars), choice(workshops), start_time, end_time,randint(100,500)))
 
 
 def insert_charging():
     cars = db.all('SELECT car_id FROM car')
     stations = db.all('SELECT station_id FROM charging_station')
-    query = """INSERT INTO charging (car_id, station_id, start_date, end_date) 
-                    VALUES ('{}','{}','{}','{}')"""
+    query = """INSERT INTO charging (car_id, station_id, start_date, end_date,price) 
+                    VALUES ('{}','{}','{}','{}',{})"""
     for i in range(100):
         timestamp = randint(start_stamp, end_stamp)
         timedelta = randint(1e3, 2e4)
         start_time = datetime.isoformat(datetime.fromtimestamp(timestamp), sep=' ')
         end_time = datetime.isoformat(datetime.fromtimestamp(timestamp + timedelta), sep=' ')
-        db.run(query.format(choice(cars), choice(stations), start_time, end_time))
+        db.run(query.format(choice(cars), choice(stations), start_time, end_time, randint(10, 250)))
 
 
 def insert_request():
@@ -197,6 +197,7 @@ def fill_data():
     insert_fill_tests()
     insert_car_parts()
     insert_spent_parts()
+
 
 if __name__ == '__main__':
     fill_data()

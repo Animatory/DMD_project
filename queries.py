@@ -90,7 +90,7 @@ def select6():
         top_starts = db.all(query.format('start', start, end), back_as=dict)
         top_ends = db.all(query.format('end', start, end), back_as=dict)
         result.append(['Most popular pick-up locations on ({}-{}) {}'.format(start, end, top_starts), \
-        'Most popular destination locations on ({}-{}) {}'.format(start, end, top_ends)])
+                       'Most popular destination locations on ({}-{}) {}'.format(start, end, top_ends)])
     return result
 
 
@@ -116,3 +116,21 @@ def select8(date):
     res = db.all(s8.format(date), back_as=dict)
     print(res)
     return res
+
+
+def select10():
+    query = '''select r.car_id,c.avg_charge_price + r.avg_repair_price as sum_of_average_expenses
+                from (SELECT car_id,avg(price) as avg_repair_price from repair group by car_id order by avg(price)) r
+                inner join (
+                SELECT car_id,avg(price) as avg_charge_price from charging group by car_id order by avg(car_id)) c
+                on c.car_id = r.car_id
+                group by r.car_id,c.avg_charge_price + r.avg_repair_price order by c.avg_charge_price + r.avg_repair_price
+'''
+    cars = db.all(query)
+    cars = cars[-3:]
+    print('Top expensive-to-maintain cars:')
+    print(cars)
+    return cars
+
+if __name__=='__main__':
+    pass

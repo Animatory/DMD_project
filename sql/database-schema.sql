@@ -185,7 +185,8 @@ create table repair
 		constraint workshop_fk
 			references workshop,
 	start_date timestamp not null,
-	end_date timestamp not null
+	end_date timestamp not null,
+	price integer default 200
 );
 
 alter table repair owner to postgres;
@@ -215,7 +216,8 @@ create table charging
 		constraint station_fk
 			references charging_station,
 	start_date timestamp not null,
-	end_date timestamp not null
+	end_date timestamp not null,
+	price integer default 100
 );
 
 alter table charging owner to postgres;
