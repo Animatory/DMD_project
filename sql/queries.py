@@ -6,13 +6,17 @@ s5 = "select avg(route_length),avg(start_time-end_time) from request where start
 s6_1 = "select start_location_id,count(start_location_id) from request  where extract(hour from start_time)<{} and extract(hour from start_time)<{} group by start_location_id order by count(start_location_id)"
 s6_2 = "select end_location_id,count(end_location_id) from request where extract(hour from start_time)<{} and extract(hour from start_time)<{} group by end_location_id order by count(end_location_id) "
 s7 = "select car_id,count(car_id) from request group by car_id order by count(car_id)"
+s8 = "select r.username,count(c.car_id) as cars_charge_count from request r inner join charging c on r.car_id = c.car_id and r.start_time::date = date '{}' and c.start_date::date = date '{}' group by r.username"
 
 
 def select1(username):
     query = """
         SELECT car.car_id, car.number, car.model_id, car.vin, car.color FROM request 
         INNER JOIN car 
-        ON request.car_id=car.car_id and car.color='red' and car.number like 'AN%' and request.username='{}'
+        ON request.car_id=car.car_id 
+        AND car.color='red' 
+        AND car.number LIKE 'AN%' 
+        AND request.username='{}'
     """
     cars = db.all(query.format(username))
     print(cars)
@@ -42,7 +46,6 @@ def select2(date):
 
 
 def select4(username):
-    query = 0
     payments = db.all(s4.format(username, datetime.now() - timedelta(days=31)))
     print(payments)
     return payments
@@ -72,10 +75,18 @@ def select7():
     return least_cars
 
 
+def select8(date):
+    print(date)
+    res = db.all(s8.format(date,date))
+    print(res)
+    return res
+
+
 if __name__ == '__main__':
     select1("88JeeDQYI")
     # select2('2033-05-04')
     # select4('11SlavaARDD')
     # select5('2001-09-19')
     # select6()
-    # select7()
+    #select7()
+    select8('2003-04-25')
