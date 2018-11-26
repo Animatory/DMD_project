@@ -7,6 +7,7 @@ s4 = "select * from request where request.username = '{}' and request.start_time
 s5 = "select avg(route_length),avg(start_time-end_time) from request where start_time::date = date '{}'"
 s6_1 = "select start_location_id,count(start_location_id) from request  where extract(hour from start_time)<{} and extract(hour from start_time)<{} group by start_location_id order by count(start_location_id)"
 s6_2 = "select end_location_id,count(end_location_id) from request where extract(hour from start_time)<{} and extract(hour from start_time)<{} group by end_location_id order by count(end_location_id) "
+s7 = "select car_id,count(car_id) from request group by car_id order by count(car_id)"
 
 
 def select1(username):
@@ -47,10 +48,18 @@ def select6():
     return result
 
 
+def select7():
+    least_cars = db.all(s7)
+    least_cars = least_cars[:round(len(least_cars) / 10)]
+    print(least_cars)
+    return least_cars
+
+
 if __name__ == '__main__':
-    pass
+    # pass
     # select1(None)
     # select2('1970-01-05')
     # select4('11SlavaARDD')
     # select5('2001-09-19')
     # select6()
+    select7()
