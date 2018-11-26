@@ -5,7 +5,7 @@ services:
     image: dmd_project
     build: .
     volumes: 
-      - .:/app
+      - .:/app:Z
     depends_on:
       - db
     ports:

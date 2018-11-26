@@ -1,4 +1,4 @@
-from sql.fill_data import db
+from fill_data import db
 from datetime import datetime, timedelta
 
 s4 = "select * from request where request.username = '{}' and request.start_time >= '{}'"
