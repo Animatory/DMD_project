@@ -89,9 +89,8 @@ def select6():
     for start, end in [[7, 10], [12, 14], [17, 19]]:
         top_starts = db.all(query.format('start', start, end), back_as=dict)
         top_ends = db.all(query.format('end', start, end), back_as=dict)
-        print('Most popular pick-up locations on ({}-{}) {}'.format(start, end, top_starts))
-        print('Most popular destination locations on ({}-{}) {}'.format(start, end, top_ends))
-        result.append([top_starts, top_ends])
+        result.append(['Most popular pick-up locations on ({}-{}) {}'.format(start, end, top_starts), \
+        'Most popular destination locations on ({}-{}) {}'.format(start, end, top_ends)])
     return result
 
 
@@ -114,10 +113,6 @@ def select8(date):
         SELECT r.username, count(c.car_id) AS cars_charge_count 
         FROM request r INNER JOIN charging c ON r.car_id = c.car_id and r.start_time::date = c.start_date ::date and r.start_time>='{}' group by r.username
     """
-    res = db.all(s8.format(date))
+    res = db.all(s8.format(date), back_as=dict)
     print(res)
     return res
-
-
-if __name__ == '__main__':
-    pass

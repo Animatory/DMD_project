@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 from queries import *
 from functools import wraps
 
@@ -37,29 +37,30 @@ def required_fields(fields):
 
 @app.route('/', methods=['GET'])
 def index():
-    return 'Hello wold'
+    return render_template('index.html')
 
 
 @app.route('/query1', methods=['GET'])
 @required_fields(['username'])
 def query1():
     result_db = select1(request.args['username'])
-
-    return jsonify(result_db)
+    return jsonify([['car_id', 'number','model_id','vin','color'],result_db])
 
 
 @app.route('/query2', methods=['GET'])
 @required_fields(['date'])
 def query2():
     result_db = select2(request.args['date'])
-    return jsonify(result_db)
+    print(result_db)
+    units = {'{:0>2}h-{:0>2}h'.format(hour, hour + 1): result_db[hour] for hour in range(24)}
+    return jsonify([['hours', 'count of charging cars'],units])
 
 
 @app.route('/query3', methods=['GET'])
 @required_fields(['start','end'])
 def query3():
     result_db = select3(request.args['start'], request.args['end'])
-    return jsonify(result_db)
+    return jsonify([['Morning','Afternoon','Evening'], result_db])
 
 
 @app.route('/query4', methods=['GET'])
@@ -72,8 +73,9 @@ def query4():
                 result_db[row][key] = result_db[row][key].strftime("%Y-%m-%d %H:%M:%S")
             if type(result_db[row][key]) is time:
                 result_db[row][key] = result_db[row][key].strftime("%H:%M:%S")
-    print(result_db)
-    return jsonify(result_db)
+    
+    return jsonify([['car_id','end_location_id','end_time','payment', 'request_id','route_length','start_location_id','start_time','username','waiting_time'],\
+                    result_db])
 
 @app.route('/query5', methods=['GET'])
 @required_fields(['date'])
@@ -101,14 +103,14 @@ def query6():
 @app.route('/query7', methods=['GET'])
 def query7():
     result_db = select7()
-    return jsonify(result_db)
+    return jsonify([['car_id','count'],result_db])
 
 
 @app.route('/query8', methods=['GET'])
 @required_fields(['date'])
 def query8():
     result_db = select8(request.args['date'])
-    return jsonify(result_db)
+    return jsonify([['cars_charge_count','username'],result_db])
 
 
 if __name__ == '__main__':
