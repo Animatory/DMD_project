@@ -113,6 +113,19 @@ def query8():
     return jsonify([['cars_charge_count','username'],result_db])
 
 
+@app.route('/query9', methods=['GET'])
+@required_fields(['period'])
+def query9():
+    result_db = select4(request.args['period'])
+    for row in range(len(result_db)):
+        for key in result_db[row]:
+            if type(result_db[row][key]) == type(datetime.now()):
+                result_db[row][key] = result_db[row][key].strftime("%Y-%m-%d %H:%M:%S")
+            if type(result_db[row][key]) is time:
+                result_db[row][key] = result_db[row][key].strftime("%H:%M:%S")
+    
+    return jsonify([[],[result_db]])
+
 @app.route('/query10', methods=['GET'])
 def query10():
     result_db = select10()
