@@ -80,7 +80,7 @@ def query4():
 @app.route('/query5', methods=['GET'])
 @required_fields(['date'])
 def query5():
-    result_db = select5(request.args['date'])
+    result_db = list(select5(request.args['date']))
     print(result_db)
     for row in range(len(result_db)):
         if type(result_db[row]) is datetime:
@@ -91,7 +91,7 @@ def query5():
             result_db[row] = str(result_db[row])
     print(result_db)
 
-    return jsonify(result_db)
+    return jsonify([['avg distance km', 'avg duration'],result_db])
 
 
 @app.route('/query6', methods=['GET'])
