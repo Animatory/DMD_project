@@ -6,13 +6,13 @@ import string
 from datetime import datetime, time
 
 db = Postgres(
-    'postgres://{}:{}@{}:{}/{}'.format(database_user, database_password, database_host, database_port, database), )
+    'postgres://{}:{}@{}:{}/{}'.format(database_user, database_password, database_host, database_port, database))
 
 
 def recreate():
     db.run("""drop table if exists request;
               drop table if exists charging;
-              --drop table if exists spent_part;
+              drop table if exists spent_part;
               drop table if exists repair;
               drop table if exists customer;
               drop table if exists workshop;
@@ -26,35 +26,35 @@ def recreate():
 
 
 def insert_fill_tests():
-    locations = db.all('select location_id from location')
+    query1 = """INSERT into customer (username, email, name, surname, phone, location_id) 
+                values ('Stipa','stipa@gmail.com','Vasily','Sasniy','+73733773','{}')"""
+
+    query2 = """INSERT INTO car (model_id, vin, available, color, number) values ('{}','{}','{}','{}','{}')"""
+
+    query3 = """INSERT INTO request (username, car_id, payment, start_time, end_time, 
+                start_location_id, end_location_id, waiting_time, route_length)
+                values ('{}','{}','{}','{}','{}','{}','{}','{}','{}')"""
+
+    locations = db.all('SELECT location_id FROM location')
     try:
-        db.run('''INSERT into customer (username, email, name, surname, phone, location_id) 
-        values ('Stipa','stipa@gmail.com','Vasily','Sasniy','+73733773',{})'''.format(locations[0]))
+        db.run(query1.format(locations[0]))
     except:
         pass  # already exists
-    models = db.all('SELECT model_id from model')
+    models = db.all('SELECT model_id FROM model')
     for i in range(10):
-        db.run('''INSERT INTO car (model_id, vin, available, color, number)
-               values ({},{},{},'{}','{}')'''.format(models[0], randint(100000, 999999), True, 'red',
-                                                     'AN' + ''.join(choices(string.ascii_lowercase, k=3)).capitalize()))
-        last_id = db.one('SELECT MAX(car_id) from car')
-        db.run('''INSERT INTO request (username, car_id, payment, start_time, end_time, start_location_id, end_location_id, waiting_time, route_length)
-               values ('{}',{},{},'{}','{}',{},{},'{}',{})'''.format('Stipa', last_id, 100,
-                                                                     '2018-11-07 10:07:07.000000',
-                                                                     '2018-11-07 10:07:07.000000', locations[0],
-                                                                     locations[1],
-                                                                     '00:26:05', 100))
+        db.run(query2.format(models[0], randint(1e6, 1e7 - 1), True, 'red',
+                             'AN' + ''.join(choices(string.ascii_lowercase, k=3)).capitalize()))
+        last_id = db.one('SELECT MAX(car_id) FROM car')
+        db.run(query3.format('Stipa', last_id, 100, '2018-11-07 10:07:07.000000',
+                             '2018-11-07 10:07:07.000000', locations[0], locations[1], '00:26:05', 100))
 
 
 def insert_models():
-    ids = db.all('SELECT provider_id from car_provider')
-    script = """INSERT INTO model (class, max_charge, capacity, provider_id, price) VALUES ('{}','{}','{}','{}','{}')"""
+    ids = db.all('SELECT provider_id FROM car_provider')
+    query = """INSERT INTO model (class, max_charge, capacity, provider_id, price) VALUES ('{}','{}','{}','{}','{}')"""
     for i in range(10):
-        db.run(script.format(choice(model_classes),
-                             randint(8, 14) * 1000,
-                             randint(2, 6),
-                             choice(ids),
-                             choice(range(10, 1000))))
+        db.run(query.format(choice(model_classes), randint(8, 14) * 1000, randint(2, 6), choice(ids),
+                            choice(range(10, 1000))))
 
 
 def insert_car_providers():
@@ -63,23 +63,23 @@ def insert_car_providers():
 
 
 def insert_cars():
-    models = db.all('SELECT model_id from model')
-    script = """INSERT INTO car (model_id, vin, available, color, number) VALUES ('{}','{}','{}','{}','{}')"""
+    models = db.all('SELECT model_id FROM model')
+    query = """INSERT INTO car (model_id, vin, available, color, number) VALUES ('{}','{}','{}','{}','{}')"""
     for i in range(100):
         rand_number = ''.join(choices(string.ascii_uppercase + string.digits, k=5))
-        db.run(script.format(choice(models), randint(1e8, 1e9 - 1), True, choice(colors), rand_number))
+        db.run(query.format(choice(models), randint(1e8, 1e9 - 1), True, choice(colors), rand_number))
 
 
 def insert_customers():
-    script = """INSERT INTO customer (username, email, name, surname, phone, location_id) VALUES 
+    query = """INSERT INTO customer (username, email, name, surname, phone, location_id) VALUES 
                 ('{}','{}','{}','{}','{}','{}')"""
     for i in range(1000):
         name = choice(names)
         username = str(randint(0, 100)) + name + ''.join(choices(string.ascii_uppercase, k=4))
         email = str(randint(0, 1000)) + name + str(randint(0, 1000)) + '@gmail.com'
-        db.run(script.format(username, email, name,
-                             ''.join(choices(string.ascii_uppercase, k=3)),
-                             '+' + str(randint(1e7, 1e8 - 1)), 1))
+        db.run(query.format(username, email, name,
+                            ''.join(choices(string.ascii_uppercase, k=3)),
+                            '+' + str(randint(1e7, 1e8 - 1)), 1))
 
 
 def insert_location():
@@ -88,61 +88,61 @@ def insert_location():
     zipcode = [randint(1e6, 1e7 - 1) for i in range(100)]
     street = [''.join(choices(string.ascii_lowercase, k=15)).capitalize() for i in range(1000)]
     house = [randint(1, 100) for i in range(100)]
-    script = """INSERT INTO location (country, city, zipcode, street, house) VALUES ('{}','{}','{}','{}','{}')"""
+    query = """INSERT INTO location (country, city, zipcode, street, house) VALUES ('{}','{}','{}','{}','{}')"""
     for i in range(1000):
-        db.run(script.format(choice(countries), choice(cities), choice(zipcode), choice(street), choice(house)))
+        db.run(query.format(choice(countries), choice(cities), choice(zipcode), choice(street), choice(house)))
 
 
 def insert_charging_station():
-    locations = db.all('SELECT location_id from location')
-    script = """INSERT INTO charging_station (available_sockets, maximum_sockets, location_id) 
+    locations = db.all('SELECT location_id FROM location')
+    query = """INSERT INTO charging_station (available_sockets, maximum_sockets, location_id) 
                 VALUES ('{}','{}','{}')"""
     for i in range(100):
         sockets = randint(5, 10)
-        db.run(script.format(sockets, sockets, choice(locations)))
+        db.run(query.format(sockets, sockets, choice(locations)))
 
 
 def insert_workshop():
-    locations = db.all('SELECT location_id from location')
-    script = """INSERT INTO workshop (open_time, close_time, location_id) 
+    locations = db.all('SELECT location_id FROM location')
+    query = """INSERT INTO workshop (open_time, close_time, location_id) 
                 VALUES ('{}','{}','{}')"""
     for i in range(11):
         start_time = time.isoformat(time(hour=randint(5, 10)))
         end_time = time.isoformat(time(hour=randint(20, 23)))
-        db.run(script.format(start_time, end_time, choice(locations)))
+        db.run(query.format(start_time, end_time, choice(locations)))
 
 
 def insert_repair():
-    cars = db.all('SELECT car_id from car')
-    workshops = db.all('SELECT workshop_id from workshop')
-    script = """INSERT INTO repair (car_id, workshop_id, start_date, end_date) 
+    cars = db.all('SELECT car_id FROM car')
+    workshops = db.all('SELECT workshop_id FROM workshop')
+    query = """INSERT INTO repair (car_id, workshop_id, start_date, end_date) 
                 VALUES ('{}','{}','{}','{}')"""
-    for i in range(200):
+    for i in range(11):
         timestamp = randint(start_stamp, end_stamp)
         timedelta = randint(1e5, 1e6)
         start_time = datetime.isoformat(datetime.fromtimestamp(timestamp), sep=' ')
         end_time = datetime.isoformat(datetime.fromtimestamp(timestamp + timedelta), sep=' ')
-        db.run(script.format(choice(cars), choice(workshops), start_time, end_time))
+        db.run(query.format(choice(cars), choice(workshops), start_time, end_time))
 
 
 def insert_charging():
-    cars = db.all('SELECT car_id from car')
-    stations = db.all('SELECT station_id from charging_station')
-    script = """INSERT INTO charging (car_id, station_id, start_date, end_date) 
+    cars = db.all('SELECT car_id FROM car')
+    stations = db.all('SELECT station_id FROM charging_station')
+    query = """INSERT INTO charging (car_id, station_id, start_date, end_date) 
                     VALUES ('{}','{}','{}','{}')"""
     for i in range(1100):
         timestamp = randint(start_stamp, end_stamp)
         timedelta = randint(1e3, 2e4)
         start_time = datetime.isoformat(datetime.fromtimestamp(timestamp), sep=' ')
         end_time = datetime.isoformat(datetime.fromtimestamp(timestamp + timedelta), sep=' ')
-        db.run(script.format(choice(cars), choice(stations), start_time, end_time))
+        db.run(query.format(choice(cars), choice(stations), start_time, end_time))
 
 
 def insert_request():
-    customers = db.all('SELECT username from customer')
-    cars = db.all('SELECT car_id from car')
-    locations = db.all('SELECT location_id from location')
-    script = """INSERT INTO request (username, car_id, payment, start_time, end_time, start_location_id,
+    customers = db.all('SELECT username FROM customer')
+    cars = db.all('SELECT car_id FROM car')
+    locations = db.all('SELECT location_id FROM location')
+    query = """INSERT INTO request (username, car_id, payment, start_time, end_time, start_location_id,
                                      end_location_id, waiting_time, route_length) 
                 VALUES ('{}','{}','{}','{}','{}','{}','{}','{}','{}')"""
     for i in range(100):
@@ -164,8 +164,8 @@ def insert_request():
         start_time = datetime.isoformat(datetime.fromtimestamp(timestamp), sep=' ')
         end_time = datetime.isoformat(datetime.fromtimestamp(timestamp + duration), sep=' ')
 
-        db.run(script.format(customer, car_id, payment, start_time, end_time,
-                             start_locations, end_locations, waiting_time, length))
+        db.run(query.format(customer, car_id, payment, start_time, end_time,
+                            start_locations, end_locations, waiting_time, length))
 
 
 def insert_car_parts():
@@ -195,8 +195,6 @@ def fill_data():
     insert_repair()
     insert_request()
     insert_fill_tests()
-    insert_car_parts()
-    insert_spent_parts()
 
 
 if __name__ == '__main__':
