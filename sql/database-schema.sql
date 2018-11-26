@@ -199,6 +199,20 @@ create table repair
 alter table repair
   owner to postgres;
 
+create table spent_part
+(
+  repair_id integer           not null
+    constraint spent_part_repair_repair_id_fk
+    references repair,
+  part_id   integer           not null
+    constraint spent_part_car_part_part_id_fk
+    references car_part,
+  amount    integer default 0 not null
+);
+
+alter table spent_part
+  owner to postgres;
+
 create unique index repair_repair_id_uindex
   on repair (repair_id);
 
