@@ -177,7 +177,7 @@ def fill_data():
     insert_workshop()
     insert_repair()
     insert_request()
-
+    insert_fill_tests()
 
 if __name__ == '__main__':
     insert_fill_tests()
