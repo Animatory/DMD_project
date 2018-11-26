@@ -1,0 +1,14 @@
+version: '2.1'
+
+services:
+  dmd_project:
+    image: dmd_project
+    build: .
+    volumes: 
+      - .:/app
+    depends_on:
+      - db
+    ports:
+      - 5000:5000
+  db:
+    image: postgres

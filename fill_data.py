@@ -1,11 +1,11 @@
 from postgres import Postgres
 from random import randint, choices, choice
-from sql.data import *
+from data import *
 import string
-from config import database_source
+from config import database_host
 from datetime import datetime, time
 
-db = Postgres(database_source)
+db = Postgres(database_host)
 
 
 def recreate():
@@ -53,7 +53,7 @@ def insert_customers():
         name = choice(names)
         username = str(randint(0, 100)) + name + ''.join(choices(string.ascii_uppercase, k=4))
         email = str(randint(0, 1000)) + name + str(randint(0, 1000)) + '@gmail.com'
-        db.run(script.format(username, email, name,
+        db.run(script.format(username, email, nasourceme,
                              ''.join(choices(string.ascii_uppercase, k=3)),
                              '+' + str(randint(1e7, 1e8 - 1)), 1))
 
