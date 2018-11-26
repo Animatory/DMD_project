@@ -2,24 +2,24 @@ from postgres import Postgres
 from random import randint, choices, choice
 from data import *
 import string
-from config import database_host, start_stamp, end_stamp
+from config import *
 from datetime import datetime, time
 
-db = Postgres(database_host)
+db = Postgres('postgres://{}:{}@{}:{}/{}'.format(database_user, database_password, database_host, database_port, database), )
 
 
 def recreate():
-    db.run("""drop table request;
-              drop table charging;
-              drop table repair;
-              drop table customer;
-              drop table workshop;
-              drop table charging_station;
-              drop table car;
-              drop table model;
-              drop table car_provider;
+    db.run("""drop table if exists request;
+              drop table if exists charging;
+              drop table if exists repair;
+              drop table if exists customer;
+              drop table if exists workshop;
+              drop table if exists charging_station;
+              drop table if exists car;
+              drop table if exists model;
+              drop table if exists car_provider;
               drop table location;""")
-    db.run(open('database-schema.sql', 'r').read())
+    db.run(open('sql/database-schema.sql', 'r').read())
 
 
 def insert_models():

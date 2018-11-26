@@ -12,3 +12,6 @@ services:
       - 5000:5000
   db:
     image: postgres
+    environment:
+      POSTGRES_PASSWORD: car_sharing_password
+      POSTGRES_DB: car_sharing
