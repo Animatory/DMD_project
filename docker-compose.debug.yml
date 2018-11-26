@@ -1,0 +1,10 @@
+version: '2.1'
+
+services:
+  dmd_project:
+    image: dmd_project
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 5000:5000
