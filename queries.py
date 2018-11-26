@@ -110,9 +110,9 @@ def select7():
 def select8(date):
     s8 = """
         SELECT r.username, count(c.car_id) AS cars_charge_count 
-        FROM request r INNER JOIN charging c ON r.car_id = c.car_id and r.start_time::date = date '{}' and c.start_date::date = date '{}' group by r.username"
+        FROM request r INNER JOIN charging c ON r.car_id = c.car_id and r.start_time::date = c.start_date ::date and r.start_time>='{}' group by r.username
     """
-    res = db.all(s8.format(date, date))
+    res = db.all(s8.format(date))
     print(res)
     return res
 
