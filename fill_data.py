@@ -2,8 +2,8 @@ from postgres import Postgres
 from random import randint, choices, choice
 from data import *
 import string
-from config import database_source
-from datetime import datetime, time, timedelta as td
+from config import database_host, start_stamp, end_stamp
+from datetime import datetime, time
 
 db = Postgres(database_host)
 
@@ -145,21 +145,17 @@ def insert_request():
 
 
 def fill_data():
-    pass
-    # recreate()
-    # insert_location()
-    # insert_customers()
-    # insert_car_providers()
-    # insert_models()
-    # insert_cars()
-    # insert_charging_station()
-    # insert_charging()
-    # insert_workshop()
-    # insert_repair()
-    # insert_request()
-
-
-# insert_charging()
+    recreate()
+    insert_location()
+    insert_customers()
+    insert_car_providers()
+    insert_models()
+    insert_cars()
+    insert_charging_station()
+    insert_charging()
+    insert_workshop()
+    insert_repair()
+    insert_request()
 
 if __name__ == '__main__':
     fill_data()
