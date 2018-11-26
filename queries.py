@@ -95,7 +95,7 @@ def select6():
 
 
 def select7():
-    s7 = '''select car_id,count(car_id) from request group by car_id order by count(car_id)'''
+    s7 = '''select car_id,count(car_id) as number_of_uses from request group by car_id order by count(car_id)'''
     least_cars = db.all(s7)
     least_cars = least_cars[:round(len(least_cars) / 10)]
     print(least_cars)
