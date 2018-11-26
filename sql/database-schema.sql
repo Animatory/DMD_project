@@ -138,6 +138,9 @@ create unique index car_vin_uindex
 
 create table request
 (
+  request_id        serial           not null
+    constraint request_pk
+    primary key,
   username          varchar(255)     not null
     constraint user_fk
     references customer,
@@ -159,6 +162,9 @@ create table request
 
 alter table request
   owner to postgres;
+
+create unique index request_request_id_uindex
+  on request (request_id);
 
 create table repair
 (
