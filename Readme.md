@@ -1,4 +1,4 @@
-#Dmd assingment
+# Dmd assingment
 
 **Team**, BS-17: <br/>
 Babichev Rinat <br/>
