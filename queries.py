@@ -118,11 +118,4 @@ def select8(date):
 
 
 if __name__ == '__main__':
-    # select1("88JeeDQYI")
-    # select2('2033-05-04')
-    # select3()
-    # select4('11SlavaARDD')
-    # select5('2001-09-19')
-    # select6()
-    select7()
-    # select8('2003-04-25')
+    pass
