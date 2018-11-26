@@ -11,12 +11,14 @@ db = Postgres('postgres://{}:{}@{}:{}/{}'.format(database_user, database_passwor
 def recreate():
     db.run("""drop table if exists request;
               drop table if exists charging;
+              --drop table if exists spent_part;
               drop table if exists repair;
               drop table if exists customer;
               drop table if exists workshop;
               drop table if exists charging_station;
               drop table if exists car;
               drop table if exists model;
+              drop table if exists car_part;
               drop table if exists car_provider;
               drop table location;""")
     db.run(open('sql/database-schema.sql', 'r').read())

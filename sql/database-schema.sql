@@ -1,3 +1,18 @@
+create table car_part
+(
+  part_id serial       not null
+    constraint car_part_pkey
+    primary key,
+  name    varchar(255) not null,
+  price   integer      not null
+);
+
+alter table car_part
+  owner to postgres;
+
+create unique index car_part_part_id_uindex
+  on car_part (part_id);
+
 create table location
 (
   location_id serial not null
@@ -168,6 +183,9 @@ create unique index request_request_id_uindex
 
 create table repair
 (
+  repair_id   serial    not null
+    constraint repair_pk
+    primary key,
   car_id      integer   not null
     constraint car_fk
     references car,
@@ -180,6 +198,9 @@ create table repair
 
 alter table repair
   owner to postgres;
+
+create unique index repair_repair_id_uindex
+  on repair (repair_id);
 
 create table charging
 (
