@@ -49,7 +49,8 @@ def select3(start_period='2011-06-24', end_period='2011-08-24'):
                 OR request.end_time::TIME >= TIME '{2:0>2}:00')
                 AND request.start_time::DATE != request.end_time::DATE)
     """
-    count = [db.one(query.format(start_period, end_period, i, j), back_as=dict) for i, j in [(7, 10), (12, 14), (17, 19)]]
+    count = [db.one(query.format(start_period, end_period, i, j), back_as=dict) for i, j in
+             [(7, 10), (12, 14), (17, 19)]]
     log = "{:<10}{:<10}{}\n{:<10}{:<10}{}".format("Morning", "Afternoon", "Evening", *count)
     print(log)
     return count
@@ -63,10 +64,11 @@ def select4(username):
 
 
 def select5(date):
-    query = "SELECT avg(route_length),avg(start_time-end_time) FROM request WHERE start_time::DATE = DATE '{}'"
-    stat = db.all(query.format(date), back_as=dict)
-    print(stat)
-    return stat
+    query = "SELECT avg(route_length) FROM request WHERE start_time::DATE = DATE '{}'"
+    query2 = "SELECT avg(end_time - start_time) FROM request WHERE start_time::DATE = DATE '{}'"
+    stat = db.one(query.format(date))
+    stat2 = db.one(query2.format(date))
+    return stat, stat2
 
 
 def select6():
