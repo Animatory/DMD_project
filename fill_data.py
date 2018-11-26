@@ -21,7 +21,7 @@ def recreate():
               drop table if exists model;
               drop table if exists car_part;
               drop table if exists car_provider;
-              drop table location;""")
+              drop table if exists location;""")
     db.run(open('sql/database-schema.sql', 'r').read())
 
 
@@ -39,7 +39,8 @@ def insert_fill_tests():
                                                      'AN' + ''.join(choices(string.ascii_lowercase, k=3)).capitalize()))
         last_id = db.one('SELECT MAX(car_id) from car')
         db.run('''INSERT INTO request (username, car_id, payment, start_time, end_time, start_location_id, end_location_id, waiting_time, route_length)
-               values ('{}',{},{},'{}','{}',{},{},'{}',{})'''.format('Stipa', last_id, 100, '2018-11-07 10:07:07.000000',
+               values ('{}',{},{},'{}','{}',{},{},'{}',{})'''.format('Stipa', last_id, 100,
+                                                                     '2018-11-07 10:07:07.000000',
                                                                      '2018-11-07 10:07:07.000000', locations[0],
                                                                      locations[1],
                                                                      '00:26:05', 100))
@@ -116,7 +117,7 @@ def insert_repair():
     workshops = db.all('SELECT workshop_id from workshop')
     script = """INSERT INTO repair (car_id, workshop_id, start_date, end_date) 
                 VALUES ('{}','{}','{}','{}')"""
-    for i in range(11):
+    for i in range(200):
         timestamp = randint(start_stamp, end_stamp)
         timedelta = randint(1e5, 1e6)
         start_time = datetime.isoformat(datetime.fromtimestamp(timestamp), sep=' ')
@@ -167,6 +168,20 @@ def insert_request():
                              start_locations, end_locations, waiting_time, length))
 
 
+def insert_car_parts():
+    script = "INSERT INTO car_part (name, price) VALUES ('{}',{})"
+    for part in car_parts:
+        db.run(script.format(part, randint(100, 20000)))
+
+
+def insert_spent_parts():
+    script = 'INSERT INTO spent_part (repair_id, part_id,amount) VALUES ({},{},{})'
+    repairs = db.all('select repair_id from repair')
+    parts = db.all('select part_id from car_part')
+    for i in range(800):
+        db.run(script.format(choice(repairs), choice(parts), randint(1, 5)))
+
+
 def fill_data():
     recreate()
     insert_location()
@@ -180,6 +195,8 @@ def fill_data():
     insert_repair()
     insert_request()
     insert_fill_tests()
+    insert_car_parts()
+    insert_spent_parts()
 
 
 if __name__ == '__main__':
