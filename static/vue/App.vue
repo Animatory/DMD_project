@@ -14,7 +14,7 @@ export default {
     },
     data: function() {
         return {
-            queries: [1, 2, 3, 4, 5, 6, 7, 8]
+            queries: [1, 2, 3, 4, 5, 6, 7, 8, 10]
         }
     }
 }

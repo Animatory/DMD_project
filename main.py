@@ -113,5 +113,21 @@ def query8():
     return jsonify([['cars_charge_count','username'],result_db])
 
 
+@app.route('/query10', methods=['GET'])
+def query10():
+    result_db = select10()
+    for row in range(len(result_db)):
+        for key in result_db[row]:
+            if type(result_db[row][key]) is datetime:
+                result_db[row][key] = result_db[row][key].strftime("%Y-%m-%d %H:%M:%S")
+            elif type(result_db[row][key]) is time:
+                result_db[row][key] = result_db[row][key].strftime("%H:%M:%S")
+            elif type(result_db[row][key]) is timedelta:
+                result_db[row][key] = str(result_db[row][key])
+            else:
+                result_db[row][key] = str(result_db[row][key])
+    return jsonify([['car_id','sum_of_average_expenses'],result_db])
+
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port='5000', debug=True)

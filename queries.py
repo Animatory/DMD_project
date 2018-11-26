@@ -126,7 +126,7 @@ def select10():
                 on c.car_id = r.car_id
                 group by r.car_id,c.avg_charge_price + r.avg_repair_price order by c.avg_charge_price + r.avg_repair_price
 '''
-    cars = db.all(query)
+    cars = db.all(query, back_as=dict)
     cars = cars[-3:]
     print('Top expensive-to-maintain cars:')
     print(cars)

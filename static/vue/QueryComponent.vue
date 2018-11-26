@@ -34,6 +34,8 @@ export default {
             [],
             [],
             ['date'],
+            [],
+            [],
         ]
 
         console.log(inputs);
