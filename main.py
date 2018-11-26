@@ -2,6 +2,9 @@ from flask import Flask, request, jsonify
 from queries import *
 from functools import wraps
 
+import re
+from datetime import datetime, time, timedelta
+
 
 app = Flask(__name__)
 
@@ -22,9 +25,12 @@ def required_fields(fields):
         @wraps(f)
         def wrap(*args, **kwargs):
             if all([f in request.args for f in fields]):
+                if 'date' in fields:
+                    if not re.match('\d{4}-\d{2}-\d{2}' ,request.args['date']):
+                        return make_error(400, 'Date format idi nahui.')
                 return f()
             else:
-                return make_error(400, ' '.join(list(map(str.capitalize, fields))) + ' are required.')
+                return make_error(400, ', '.join(list(map(str.capitalize, fields))) + ' are required.')
         return wrap
     return required
 
@@ -38,7 +44,7 @@ def index():
 @required_fields(['username'])
 def query1():
     result_db = select1(request.args['username'])
-    print(result_db)
+
     return jsonify(result_db)
 
 
@@ -50,41 +56,59 @@ def query2():
 
 
 @app.route('/query3', methods=['GET'])
+@required_fields(['start','end'])
 def query3():
-    result_db = select3()
-    return result_db
+    result_db = select3(request.args['start'], request.args['end'])
+    return jsonify(result_db)
 
 
 @app.route('/query4', methods=['GET'])
 @required_fields(['username'])
 def query4():
     result_db = select4(request.args['username'])
-    return result_db
+    for row in range(len(result_db)):
+        for key in result_db[row]:
+            if type(result_db[row][key]) == type(datetime.now()):
+                result_db[row][key] = result_db[row][key].strftime("%Y-%m-%d %H:%M:%S")
+            if type(result_db[row][key]) is time:
+                result_db[row][key] = result_db[row][key].strftime("%H:%M:%S")
+    print(result_db)
+    return jsonify(result_db)
 
 @app.route('/query5', methods=['GET'])
 @required_fields(['date'])
 def query5():
     result_db = select5(request.args['date'])
-    return result_db
+    print(result_db)
+    for row in range(len(result_db)):
+        if type(result_db[row]) is datetime:
+            result_db[row] = result_db[row].strftime("%Y-%m-%d %H:%M:%S")
+        if type(result_db[row]) is time:
+            result_db[row] = result_db[row].strftime("%H:%M:%S")
+        if type(result_db[row]) is timedelta:
+            result_db[row] = str(result_db[row])
+    print(result_db)
+
+    return jsonify(result_db)
 
 
 @app.route('/query6', methods=['GET'])
 def query6():
     result_db = select6()
-    return result_db
+    return jsonify(result_db)
 
 
 @app.route('/query7', methods=['GET'])
 def query7():
     result_db = select7()
-    return result_db
+    return jsonify(result_db)
 
 
 @app.route('/query8', methods=['GET'])
 @required_fields(['date'])
 def query8():
     result_db = select8(request.args['date'])
-    return result_db
+    return jsonify(result_db)
 
 
 if __name__ == '__main__':
