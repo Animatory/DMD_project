@@ -1,12 +1,5 @@
-from sql.fill_data import db
+from fill_data import db
 from datetime import datetime, timedelta
-
-s4 = "select * from request where request.username = '{}' and request.start_time >= '{}'"
-s5 = "select avg(route_length),avg(start_time-end_time) from request where start_time::date = date '{}'"
-s6_1 = "select start_location_id,count(start_location_id) from request  where extract(hour from start_time)<{} and extract(hour from start_time)<{} group by start_location_id order by count(start_location_id)"
-s6_2 = "select end_location_id,count(end_location_id) from request where extract(hour from start_time)<{} and extract(hour from start_time)<{} group by end_location_id order by count(end_location_id) "
-s7 = "select car_id,count(car_id) from request group by car_id order by count(car_id)"
-s8 = "select r.username,count(c.car_id) as cars_charge_count from request r inner join charging c on r.car_id = c.car_id and r.start_time::date = date '{}' and c.start_date::date = date '{}' group by r.username"
 
 
 def select1(username):
@@ -45,30 +38,64 @@ def select2(date):
     return data
 
 
+def select3():
+    count = db.one("select count(*) from car")
+    query = '''select car_id
+    from request
+    where start_time >= '{}'
+      and extract(hour from start_time) >={}
+      and extract(hour from end_time) <={}
+    group by car_id
+    '''
+    date = datetime.now() - timedelta(days=7)
+    ans = []
+    for start, end in [[7, 10], [12, 14], [17, 19]]:
+        q = db.all(query.format(date, start, end))
+        res = len(q) / count * 100
+        print(start, '-', end, ':', res)
+        ans.append([[start, end], res])
+    return ans
+
+
 def select4(username):
+    s4 = '''select * from request
+     where request.username = '{}' and request.start_time >= '{}' '''
     payments = db.all(s4.format(username, datetime.now() - timedelta(days=31)))
     print(payments)
     return payments
 
 
 def select5(date):
+    s5 = '''select avg(route_length),avg(start_time-end_time) 
+    from request where start_time::date = date '{}' '''
     stat = db.all(s5.format(date))
     print(stat)
     return stat
 
 
 def select6():
+    s6_1 = '''select start_location_id,count(start_location_id) 
+    from request  where extract(hour from start_time)<{} 
+    and extract(hour from start_time)<{} group by start_location_id 
+    order by count(start_location_id)'''
+
+    s6_2 = '''select end_location_id,count(end_location_id) 
+    from request where extract(hour from start_time)<{} 
+    and extract(hour from start_time)<{} group by end_location_id 
+    order by count(end_location_id) '''
+
     result = []
     for start, end in [[7, 10], [12, 14], [17, 19]]:
         top_starts = db.all(s6_1.format(start, end))[-3:]
         top_ends = db.all(s6_2.format(start, end))[-3:]
-        print(start, ' top-start locations', end, ' ', top_starts)
-        print(start, ' top-end locations', end, ' ', top_ends)
-        result.append([top_starts, top_ends])
+        print(start, ' top-start locations id', end, ' ', top_starts)
+        print(start, ' top-end locations id', end, ' ', top_ends)
+        result.append([[start, end], top_starts, top_ends])
     return result
 
 
 def select7():
+    s7 = '''select car_id,count(car_id) from request group by car_id order by count(car_id)'''
     least_cars = db.all(s7)
     least_cars = least_cars[:round(len(least_cars) / 10)]
     print(least_cars)
@@ -76,7 +103,11 @@ def select7():
 
 
 def select8(date):
-    res = db.all(s8.format(date,date))
+    s8 = '''select r.username,count(c.car_id) as cars_charge_count from request r 
+    inner join charging c on r.car_id = c.car_id 
+    and r.start_time::date = date '{}' 
+    and c.start_date::date = date '{}' group by r.username'''
+    res = db.all(s8.format(date, date))
     print(res)
     return res
 
