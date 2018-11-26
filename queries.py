@@ -95,27 +95,49 @@ def select6():
 
 
 def select7():
-    s7 = """
+    query = """
         SELECT c.car_id, count(r.request_id)
         FROM request r
         FULL OUTER JOIN car c
         ON r.car_id = c.car_id
         GROUP BY c.car_id ORDER BY count(r.request_id) DESC;
     """
-    cars = db.all(s7, back_as=dict)
+    cars = db.all(query, back_as=dict)
     stoped_cars = cars[len(cars) // 10:]
     print(stoped_cars)
     return stoped_cars
 
 
 def select8(date):
-    s8 = """
+    query = """
         SELECT r.username, count(c.car_id) AS cars_charge_count 
-        FROM request r INNER JOIN charging c ON r.car_id = c.car_id and r.start_time::date = c.start_date ::date and r.start_time>='{}' group by r.username
+        FROM request r INNER JOIN charging c 
+        ON r.car_id = c.car_id and r.start_time::date = c.start_date ::date and r.start_time>='{}' group by r.username
     """
-    res = db.all(s8.format(date), back_as=dict)
+    res = db.all(query.format(date), back_as=dict)
     print(res)
     return res
+
+
+def select9(period=30):
+    query = """
+        SELECT r.workshop_id, s.part_id, SUM(s.amount)
+        FROM repair r
+        INNER JOIN spent_part s on r.repair_id = s.repair_id
+        WHERE current_date - r.end_date <= interval '{}' DAY
+        GROUP BY r.workshop_id, part_id ORDER BY SUM(s.amount) desc
+    """
+    res = db.all(query.format(period), back_as=dict)
+    result = {}
+    for i in res:
+        if i['workshop_id'] in result:
+            old = result[i['workshop_id']]
+            result[i['workshop_id']] = old if old[1] > i['sum'] else (i['part_id'], i['sum'])
+        else:
+            result[i['workshop_id']] = (i['part_id'], i['sum'])
+
+    print(result)
+    return result
 
 
 def select10():
@@ -132,5 +154,14 @@ def select10():
     print(cars)
     return cars
 
-if __name__=='__main__':
-    pass
+if __name__ == '__main__':
+    # select1("88JeeDQYI")
+    # select2('2033-05-04')
+    # select3()
+    # select4('11SlavaARDD')
+    # select5('2001-09-19')
+    # select6()
+    # select7()
+    # select8('2003-04-25')
+    # select9(150)
+    select10()
