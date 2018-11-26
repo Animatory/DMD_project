@@ -1,11 +1,12 @@
+from config import *
 from postgres import Postgres
 from random import randint, choices, choice
 from data import *
 import string
-from config import *
 from datetime import datetime, time
 
-db = Postgres('postgres://{}:{}@{}:{}/{}'.format(database_user, database_password, database_host, database_port, database), )
+db = Postgres(
+    'postgres://{}:{}@{}:{}/{}'.format(database_user, database_password, database_host, database_port, database), )
 
 
 def recreate():
@@ -22,6 +23,26 @@ def recreate():
               drop table if exists car_provider;
               drop table location;""")
     db.run(open('sql/database-schema.sql', 'r').read())
+
+
+def insert_fill_tests():
+    locations = db.all('select location_id from location')
+    try:
+        db.run('''INSERT into customer (username, email, name, surname, phone, location_id) 
+        values ('Stipa','stipa@gmail.com','Vasily','Sasniy','+73733773',{})'''.format(locations[0]))
+    except:
+        pass  # already exists
+    models = db.all('SELECT model_id from model')
+    for i in range(10):
+        db.run('''INSERT INTO car (model_id, vin, available, color, number)
+               values ({},{},{},'{}','{}')'''.format(models[0], randint(100000, 999999), True, 'red',
+                                                     'AN' + ''.join(choices(string.ascii_lowercase, k=3)).capitalize()))
+        last_id = db.one('SELECT MAX(car_id) from car')
+        db.run('''INSERT INTO request (username, car_id, payment, start_time, end_time, start_location_id, end_location_id, waiting_time, route_length)
+               values ('{}',{},{},'{}','{}',{},{},'{}',{})'''.format('Stipa', last_id, 100, '2018-11-07 10:07:07.000000',
+                                                                     '2018-11-07 10:07:07.000000', locations[0],
+                                                                     locations[1],
+                                                                     '00:26:05', 100))
 
 
 def insert_models():
@@ -158,6 +179,7 @@ def fill_data():
     insert_charging()
     insert_repair()
     insert_request()
+    insert_fill_tests()
 
 
 if __name__ == '__main__':

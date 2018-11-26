@@ -11,7 +11,7 @@ def select1(username):
         AND car.number LIKE 'AN%' 
         AND request.username='{}'
     """
-    cars = db.all(query.format(username))
+    cars = db.all(query.format(username), back_as=dict)
     print(cars)
     return cars
 
@@ -31,7 +31,7 @@ def select2(date):
                 OR '{1}' >= extract(HOUR FROM charging.start_date) 
                 AND charging.start_date::DATE = DATE '{0}')
     """
-    data = [db.all(query.format(date, hour))[0] for hour in range(24)]
+    data = [db.one(query.format(date, hour), back_as=dict) for hour in range(24)]
     units = ['{:0>2}h-{:0>2}h: {}'.format(hour, hour + 1, data[hour]) for hour in range(24)]
     log = "\n".join(['{:<24}{}'.format(units[i], units[i + 12]) for i in range(12)])
     print(log)
@@ -49,7 +49,7 @@ def select3(start_period='2011-06-24', end_period='2011-08-24'):
                 OR request.end_time::TIME >= TIME '{2:0>2}:00')
                 AND request.start_time::DATE != request.end_time::DATE)
     """
-    count = [db.all(query.format(start_period, end_period, i, j))[0] for i, j in [(7, 10), (12, 14), (17, 19)]]
+    count = [db.one(query.format(start_period, end_period, i, j), back_as=dict) for i, j in [(7, 10), (12, 14), (17, 19)]]
     log = "{:<10}{:<10}{}\n{:<10}{:<10}{}".format("Morning", "Afternoon", "Evening", *count)
     print(log)
     return count
@@ -57,14 +57,14 @@ def select3(start_period='2011-06-24', end_period='2011-08-24'):
 
 def select4(username):
     query = """SELECT * FROM request WHERE request.username = '{}' AND request.start_time >= '{}'"""
-    payments = db.all(query.format(username, datetime.now() - timedelta(days=31)))
+    payments = db.all(query.format(username, datetime.now() - timedelta(days=31)), back_as=dict)
     print(payments)
     return payments
 
 
 def select5(date):
     query = "SELECT avg(route_length),avg(start_time-end_time) FROM request WHERE start_time::DATE = DATE '{}'"
-    stat = db.all(query.format(date))
+    stat = db.all(query.format(date), back_as=dict)
     print(stat)
     return stat
 
@@ -85,8 +85,8 @@ def select6():
     """
     result = []
     for start, end in [[7, 10], [12, 14], [17, 19]]:
-        top_starts = db.all(query.format('start', start, end))
-        top_ends = db.all(query.format('end', start, end))
+        top_starts = db.all(query.format('start', start, end), back_as=dict)
+        top_ends = db.all(query.format('end', start, end), back_as=dict)
         print('Most popular pick-up locations on ({}-{}) {}'.format(start, end, top_starts))
         print('Most popular destination locations on ({}-{}) {}'.format(start, end, top_ends))
         result.append([top_starts, top_ends])
@@ -101,7 +101,7 @@ def select7():
         ON r.car_id = c.car_id
         GROUP BY c.car_id ORDER BY count(r.request_id) DESC;
     """
-    cars = db.all(s7)
+    cars = db.all(s7, back_as=dict)
     stoped_cars = cars[len(cars) // 10:]
     print(stoped_cars)
     return stoped_cars
@@ -110,19 +110,12 @@ def select7():
 def select8(date):
     s8 = """
         SELECT r.username, count(c.car_id) AS cars_charge_count 
-        FROM request r INNER JOIN charging c ON r.car_id = c.car_id and r.start_time::date = date '{}' and c.start_date::date = date '{}' group by r.username"
+        FROM request r INNER JOIN charging c ON r.car_id = c.car_id and r.start_time::date = c.start_date ::date and r.start_time>='{}' group by r.username
     """
-    res = db.all(s8.format(date, date))
+    res = db.all(s8.format(date))
     print(res)
     return res
 
 
 if __name__ == '__main__':
-    # select1("88JeeDQYI")
-    # select2('2033-05-04')
-    # select3()
-    # select4('11SlavaARDD')
-    # select5('2001-09-19')
-    # select6()
-    select7()
-    # select8('2003-04-25')
+    pass
