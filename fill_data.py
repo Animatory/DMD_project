@@ -73,7 +73,7 @@ def insert_cars():
 def insert_customers():
     query = """INSERT INTO customer (username, email, name, surname, phone, location_id) VALUES 
                 ('{}','{}','{}','{}','{}','{}')"""
-    for i in range(1000):
+    for i in range(100):
         name = choice(names)
         username = str(randint(0, 100)) + name + ''.join(choices(string.ascii_uppercase, k=4))
         email = str(randint(0, 1000)) + name + str(randint(0, 1000)) + '@gmail.com'
@@ -89,7 +89,7 @@ def insert_location():
     street = [''.join(choices(string.ascii_lowercase, k=15)).capitalize() for i in range(1000)]
     house = [randint(1, 100) for i in range(100)]
     query = """INSERT INTO location (country, city, zipcode, street, house) VALUES ('{}','{}','{}','{}','{}')"""
-    for i in range(1000):
+    for i in range(100):
         db.run(query.format(choice(countries), choice(cities), choice(zipcode), choice(street), choice(house)))
 
 
@@ -130,7 +130,7 @@ def insert_charging():
     stations = db.all('SELECT station_id FROM charging_station')
     query = """INSERT INTO charging (car_id, station_id, start_date, end_date) 
                     VALUES ('{}','{}','{}','{}')"""
-    for i in range(1100):
+    for i in range(100):
         timestamp = randint(start_stamp, end_stamp)
         timedelta = randint(1e3, 2e4)
         start_time = datetime.isoformat(datetime.fromtimestamp(timestamp), sep=' ')
@@ -178,7 +178,7 @@ def insert_spent_parts():
     script = 'INSERT INTO spent_part (repair_id, part_id,amount) VALUES ({},{},{})'
     repairs = db.all('select repair_id from repair')
     parts = db.all('select part_id from car_part')
-    for i in range(800):
+    for i in range(100):
         db.run(script.format(choice(repairs), choice(parts), randint(1, 5)))
 
 
@@ -195,7 +195,8 @@ def fill_data():
     insert_repair()
     insert_request()
     insert_fill_tests()
-
+    insert_car_parts()
+    insert_spent_parts()
 
 if __name__ == '__main__':
     fill_data()
